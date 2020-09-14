@@ -1,0 +1,60 @@
+.m-lens-container {
+    display: inline-block;
+    position: relative;
+  }
+  .m-lens {
+    position: absolute;
+    top: 50px; /* JSで適切な値を設定する */
+    left: 30px; /* JSで適切な値を設定する */
+    z-index: 2;
+    background: #f57716;
+    opacity: 0.3;
+    height: 172px;
+    width: 172px;
+  }
+  .m-lens-container img {
+    max-height: 344px;
+    max-width: 344px;
+  }
+
+  .slides {
+    display: flex; /* カルーセルで横並びにする必要があるため */
+    justify-content: space-between; /* 解説用 */
+    width: 700px; /* 解説用 */
+  }
+  .slide {
+    display: table;
+    background: #fff; /* 解説用 */
+    text-align: center; /* 横に中央揃え */
+    height: 344px;
+    width: 344px;
+  }
+  .cell {
+    display: table-cell;
+    vertical-align: middle; /* 縦に中央揃え */
+  }
+  .images {
+    position: relative;
+  }
+  .slides-container { /* カルーセル表示領域 */
+    width: 344px;
+    overflow: hidden;
+  }
+  .zoom-area {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 369px;
+    border: 1px solid #ccc;
+    height: 520px;
+    width: 520px;
+    overflow: hidden;
+  }
+  .zoom-area.active {
+    display: block;
+  }
+  .zoom-area img {
+    width: 1040px; /* JSで適切な値を設定する */
+    margin-top: -30px; /* JSで適切な値を設定する */
+    margin-left: -60px; /* JSで適切な値を設定する */
+  }

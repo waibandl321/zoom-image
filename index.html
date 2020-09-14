@@ -1,0 +1,197 @@
+<html>
+  <head>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        border: 0;
+      }
+      li {
+          list-style: none;
+      }
+      body {
+          background-color: #eee;
+          padding: 50px;
+      }
+      .images {
+          position: relative;
+      }
+      .slides-container {
+          width: 344px;
+          overflow: hidden;
+      }
+      .m-lens-container {
+        display: inline-block;
+        position: relative;
+      }
+      .slides {
+          display: flex;
+          justify-content: space-between;
+          width: 700px;
+      }
+      .zoom-area {
+          position: absolute;
+          top: 0;
+          left: 369px;
+          border: 1px solid #ccc;
+          height: 520px;
+          width: 520px;
+          overflow: hidden;
+          display: none;
+      }
+      .zoom-area.active {
+          display: block;
+      }
+      .zoom-area img {
+          margin-top: -30px;
+          margin-left: -60px;
+      }
+      .slide {
+        display: table;
+        background-color: #fff;
+        text-align: center;
+        height: 344px;
+        width: 344px;
+      }
+      .cell {
+          display: table-cell;
+          vertical-align: middle;
+      }
+      /* hoverの範囲 */
+      .m-lens {
+          position: absolute;
+          top: 10px;
+          left: 20px;
+          z-index: 2;
+          background-color: #ddd;
+          opacity: .3;
+          height: 170px;
+          width: 170px;
+      }
+      /* hoverした時にJSで制御するために最初は非表示に */
+      .m-lens {
+          display: none;
+      }
+      /* 画像の上にhoverした時に表示表示させる */
+      .m-lens-container:hover .m-lens {
+        display: block;
+      }
+      .m-lens-container img {
+        max-height: 344px;
+        max-width: 344px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="images">
+        <!-- hoverした時にzoomで表示される箇所 -->
+        <div class="zoom-area">
+            <img src="">
+        </div>
+        <!-- hoverした時にzoomで表示される箇所 -->
+
+        <!-- hoverされるブロック -->
+        <div class="slides-container">
+            <ul class="slides">
+                <li class="slide">
+                    <div class="cell">
+                        <div class="m-lens-container">
+                            <img src="https://cdn.pixabay.com/photo/2015/10/12/14/54/coffee-983955_960_720.jpg">
+                            <!-- hoverの範囲 -->
+                            <div class="m-lens"></div>
+                            <!-- hoverの範囲 -->
+                        </div>
+                    </div>
+                </li>
+                <li class="slide">
+                    <div class="cell">
+                        <div class="m-lens-container">
+                            <img src="https://cdn.pixabay.com/photo/2015/10/12/14/54/coffee-983955_960_720.jpg">
+                            <!-- hoverの範囲 -->
+                            <div class="m-lens"></div>
+                            <!-- hoverの範囲 -->
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <!-- hoverされるブロック -->
+    </div>
+    <script>
+        'use strict'
+        {
+            // 各要素の取得
+            const zoomArea = document.querySelector('.zoom-area');
+            const zoomImage = zoomArea.querySelector('img');
+            // サイズの指定
+            var size = 172;
+            var scale = 520 / size;
+            /* オブジェクトのプロトタイプを生成 forEach()で配列の各要素に対して一度ずつ実行する 
+            ここではMousehoverされる要素に対する処理を行う */
+            Array.prototype.forEach.call(document.querySelectorAll('.m-lens-container'), function(container){
+                const lens = container.querySelector('.m-lens');
+                const img = container.querySelector('img');
+                //要素にmouseenterした時のzoomAreaの処理
+                container.addEventListener('mouseenter', () => {
+                    const image = container.querySelector('img');
+                    // Zoomして表示させる要素を表示させる
+                    zoomArea.classList.add('active');
+                    //表示領域の画像のsrcに取得したimageのsrcを付与
+                    zoomImage.setAttribute('src', image.src);
+                    //offsetWidthで要素のレイアウト幅を整数として返す
+                    zoomImage.style.width = (image.offsetWidth * scale) + 'px';
+                });
+                // マウスが離れた時にzoomエリアを非表示にする
+                container.addEventListener('mouseleave', () => {
+                    zoomArea.classList.remove('active');
+                });
+
+                let xmax, ymax;
+                // hover要素内の画像が読み込まれた時にhover範囲のheightとwidthを取得する
+                img.addEventListener('load', () => {
+                    xmax = img.offsetWidth - size;
+                    ymax = img.offsetHeight - size;
+                });
+                //container(hover対象要素)でマウスが動いたときの処理
+                container.addEventListener('mousemove', (e) => {
+                    // getBoundingClientRect()で要素に関連付くCSSボーダーボックスを取得
+                    const rect = container.getBoundingClientRect();
+                    // pageXでイベント発生場所の水平位置を取得
+                    const mouseX = e.pageX;
+                    // pageYでイベント発生場所の垂直位置を取得
+                    const mouseY = e.pageY;
+                    //対象要素のtop leftからの座標点を取得
+                    const positionX = rect.left + window.pageXOffset;
+                    const positionY = rect.top + window.pageYOffset;
+                    //コンテナの左上からの相対座標
+                    const offsetX = mouseX - positionX;
+                    const offsetY = mouseY - positionY;
+
+                    const left = offsetX - (size / 2);
+                    const top = offsetY - (size / 2);
+
+                    if(left > xmax){
+                        left = xmax;
+                    }
+                    if(top > ymax){
+                        top = ymax;
+                    }
+                    if(left < 0){
+                        left = 0;
+                    }
+                    if(top < 0){
+                        top = 0;
+                    }
+
+                    lens.style.top = top + 'px';
+                    lens.style.left = left + 'px';
+                    zoomImage.style.marginLeft = -(left * scale) + 'px';
+                    zoomImage.style.marginTop = -(top * scale) + 'px';
+                })
+            });
+        }   
+        
+      
+    </script>
+  </body>
+</html>
